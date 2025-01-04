@@ -150,7 +150,7 @@ struct ChartView: View {
                     PieSliceView(
                         startAngle: .degrees(startAngle(for: index)),
                         endAngle: .degrees(startAngle(for: index) + (percentage * 3.6)),
-                        color: colorForCategory(asset.category)
+                        color: colorForCategory(asset.category, type: type)
                     )
                 }
             }
@@ -163,7 +163,7 @@ struct ChartView: View {
                     ForEach(assets, id: \.category) { asset in
                         HStack(spacing: 12) {
                             Circle()
-                                .fill(colorForCategory(asset.category))
+                                .fill(colorForCategory(asset.category, type: type))
                                 .frame(width: 12, height: 12)
                             
                             Text(asset.category.rawValue)
@@ -198,26 +198,51 @@ struct ChartView: View {
         return angle
     }
     
-    private func colorForCategory(_ category: Category) -> Color {
-        switch category {
-        case .cash:
-            return Color(hex: "#2ECC71") // Yeşil
-        case .foreignCurrency:
-            return Color(hex: "#3498DB") // Mavi
-        case .gold:
-            return Color(hex: "#F1C40F") // Altın
-        case .crypto:
-            return Color(hex: "#9B59B6") // Mor
-        case .salary:
-            return Color(hex: "#E67E22") // Turuncu
-        case .food:
-            return Color(hex: "#E74C3C") // Kırmızı
-        case .transport:
-            return Color(hex: "#1ABC9C") // Turkuaz
-        case .rent:
-            return Color(hex: "#34495E") // Lacivert
-        case .other:
-            return Color(hex: "#95A5A6") // Gri
+    private func colorForCategory(_ category: Category, type: TransactionType) -> Color {
+        switch type {
+        case .income:
+            switch category {
+            case .cash:
+                return Color(hex: "#2ECC71") // Canlı yeşil
+            case .foreignCurrency:
+                return Color(hex: "#3498DB") // Parlak mavi
+            case .gold:
+                return Color(hex: "#F1C40F") // Canlı sarı
+            case .crypto:
+                return Color(hex: "#9B59B6") // Parlak mor
+            case .salary:
+                return Color(hex: "#1ABC9C") // Turkuaz
+            case .food:
+                return Color(hex: "#E67E22") // Turuncu
+            case .transport:
+                return Color(hex: "#27AE60") // Koyu yeşil
+            case .rent:
+                return Color(hex: "#16A085") // Deniz yeşili
+            case .other:
+                return Color(hex: "#2980B9") // Koyu mavi
+            }
+            
+        case .expense:
+            switch category {
+            case .cash:
+                return Color(hex: "#C0392B") // Koyu kırmızı
+            case .foreignCurrency:
+                return Color(hex: "#E74C3C") // Parlak kırmızı
+            case .gold:
+                return Color(hex: "#D35400") // Koyu turuncu
+            case .crypto:
+                return Color(hex: "#922B21") // Bordo
+            case .salary:
+                return Color(hex: "#CB4335") // Kiremit kırmızısı
+            case .food:
+                return Color(hex: "#A93226") // Kan kırmızısı
+            case .transport:
+                return Color(hex: "#B03A2E") // Koyu bordo
+            case .rent:
+                return Color(hex: "#943126") // Kahverengi kırmızı
+            case .other:
+                return Color(hex: "#8B2C1C") // En koyu kırmızı
+            }
         }
     }
 }
