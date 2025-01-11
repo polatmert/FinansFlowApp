@@ -12,6 +12,8 @@ struct ContentView: View {
     @State private var showingAddTransaction = false
     @State private var selectedTab = 0
     @State private var selectedTransactionType: TransactionType = .income
+    @Environment(\.presentationMode) var presentationMode
+    @Binding var isAuthenticated: Bool
     
     var body: some View {
         TabView(selection: $selectedTab) {
@@ -44,10 +46,18 @@ struct ContentView: View {
                 .navigationBarTitleDisplayMode(.inline)
                 .toolbar {
                     ToolbarItem(placement: .navigationBarTrailing) {
-                        Button(action: { showingAddTransaction = true }) {
-                            Image(systemName: "plus.circle.fill")
-                                .font(.title2)
-                                .foregroundColor(ThemeColors.primary)
+                        HStack {
+                            Button(action: { showingAddTransaction = true }) {
+                                Image(systemName: "plus.circle.fill")
+                                    .font(.title2)
+                                    .foregroundColor(ThemeColors.primary)
+                            }
+                            
+                            Button(action: logout) {
+                                Image(systemName: "rectangle.portrait.and.arrow.right")
+                                    .font(.title2)
+                                    .foregroundColor(ThemeColors.expense)
+                            }
                         }
                     }
                 }
@@ -62,8 +72,12 @@ struct ContentView: View {
             AddTransactionView(isPresented: $showingAddTransaction, transactions: $transactions)
         }
     }
+    
+    private func logout() {
+        isAuthenticated = false
+    }
 }
 
 #Preview {
-    ContentView()
+    ContentView(isAuthenticated: .constant(true))
 }

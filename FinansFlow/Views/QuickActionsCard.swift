@@ -3,6 +3,7 @@ import SwiftUI
 struct QuickActionsCard: View {
     @Binding var showingAddTransaction: Bool
     @Binding var transactions: [Transaction]
+    @State private var selectedTransactionType: TransactionType = .income
     
     let actions = [
         QuickAction(title: "Gelir Ekle", icon: "plus.circle.fill", color: ThemeColors.income, type: .income),
@@ -20,6 +21,7 @@ struct QuickActionsCard: View {
             HStack(spacing: 20) {
                 ForEach(actions) { action in
                     Button(action: {
+                        selectedTransactionType = action.type
                         showingAddTransaction = true
                     }) {
                         QuickActionView(action: action)
@@ -31,6 +33,13 @@ struct QuickActionsCard: View {
         .background(ThemeColors.cardBackground)
         .cornerRadius(16)
         .shadow(color: Color.black.opacity(0.05), radius: 10, x: 0, y: 4)
+        .sheet(isPresented: $showingAddTransaction) {
+            AddTransactionView(
+                isPresented: $showingAddTransaction,
+                transactions: $transactions,
+                initialType: selectedTransactionType
+            )
+        }
     }
 }
 

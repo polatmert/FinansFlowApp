@@ -11,7 +11,7 @@ import SwiftUI
 struct FinansFlowApp: App {
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            AuthView()
         }
     }
 }
