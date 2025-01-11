@@ -1,10 +1,9 @@
 import SwiftUI
-import Foundation
 
 struct MonthPickerView: View {
     @Binding var selectedDate: Date
+    @State private var showDatePicker = false
     
-    private let calendar = Calendar.current
     private let dateFormatter: DateFormatter = {
         let formatter = DateFormatter()
         formatter.dateFormat = "MMMM yyyy"
@@ -13,36 +12,42 @@ struct MonthPickerView: View {
     }()
     
     var body: some View {
-        HStack {
-            Button(action: previousMonth) {
-                Image(systemName: "chevron.left")
+        Button(action: { showDatePicker = true }) {
+            HStack {
+                Image(systemName: "calendar")
+                    .foregroundColor(ThemeColors.primary)
+                Text(dateFormatter.string(from: selectedDate))
                     .foregroundColor(ThemeColors.text)
             }
-            
-            Text(dateFormatter.string(from: selectedDate))
-                .font(.headline)
-                .foregroundColor(ThemeColors.text)
-                .frame(width: 150)
-            
-            Button(action: nextMonth) {
-                Image(systemName: "chevron.right")
-                    .foregroundColor(ThemeColors.text)
+            .padding()
+            .background(ThemeColors.cardBackground)
+            .cornerRadius(12)
+        }
+        .sheet(isPresented: $showDatePicker) {
+            NavigationView {
+                VStack {
+                    DatePicker("Tarih Seçin", 
+                             selection: $selectedDate,
+                             displayedComponents: [.date])
+                        .datePickerStyle(GraphicalDatePickerStyle())
+                        .padding()
+                        .environment(\.locale, Locale(identifier: "tr_TR"))
+                    
+                    Button("Seç") {
+                        showDatePicker = false
+                    }
+                    .padding()
+                    .frame(maxWidth: .infinity)
+                    .background(ThemeColors.primary)
+                    .foregroundColor(.white)
+                    .cornerRadius(12)
+                    .padding()
+                }
+                .navigationTitle("Ay Seçin")
+                .navigationBarItems(trailing: Button("Kapat") {
+                    showDatePicker = false
+                })
             }
-        }
-        .padding()
-        .background(ThemeColors.cardBackground)
-        .cornerRadius(12)
-    }
-    
-    private func previousMonth() {
-        if let newDate = calendar.date(byAdding: .month, value: -1, to: selectedDate) {
-            selectedDate = newDate
-        }
-    }
-    
-    private func nextMonth() {
-        if let newDate = calendar.date(byAdding: .month, value: 1, to: selectedDate) {
-            selectedDate = newDate
         }
     }
 }

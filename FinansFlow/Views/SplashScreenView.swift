@@ -1,38 +1,34 @@
 import SwiftUI
 
 struct SplashScreenView: View {
-    @State private var isAnimating = false
-    let completion: () -> Void
+    @State private var isActive = false
+    @State private var size = 0.8
+    @State private var opacity = 0.5
     
     var body: some View {
-        ZStack {
-            LinearGradient(
-                gradient: Gradient(colors: [Color(hex: "#6C63FF"), Color(hex: "#4CAF50")]),
-                startPoint: .topLeading,
-                endPoint: .bottomTrailing
-            )
-            .ignoresSafeArea()
-            
-            VStack(spacing: 20) {
+        if isActive {
+            AuthView()
+        } else {
+            VStack {
                 Image(systemName: "dollarsign.circle.fill")
-                    .font(.system(size: 100))
-                    .foregroundColor(.white)
-                    .scaleEffect(isAnimating ? 1.2 : 0.8)
-                    .opacity(isAnimating ? 1 : 0.5)
-                
+                    .font(.system(size: 80))
+                    .foregroundColor(ThemeColors.primary)
                 Text("FinansFlow")
-                    .font(.system(size: 40, weight: .bold))
-                    .foregroundColor(.white)
-                    .opacity(isAnimating ? 1 : 0)
+                    .font(.title)
+                    .foregroundColor(ThemeColors.primary)
             }
-        }
-        .onAppear {
-            withAnimation(.easeInOut(duration: 1.0)) {
-                isAnimating = true
-            }
-            
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
-                completion()
+            .scaleEffect(size)
+            .opacity(opacity)
+            .onAppear {
+                withAnimation(.easeIn(duration: 1.2)) {
+                    self.size = 0.9
+                    self.opacity = 1.0
+                }
+                DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+                    withAnimation {
+                        self.isActive = true
+                    }
+                }
             }
         }
     }

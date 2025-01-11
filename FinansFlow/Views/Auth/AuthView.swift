@@ -86,10 +86,7 @@ struct AuthView: View {
             }
         }
         .fullScreenCover(isPresented: $showSplashScreen) {
-            SplashScreenView {
-                isAuthenticated = true
-                showSplashScreen = false
-            }
+            SplashScreenView()
         }
         .fullScreenCover(isPresented: $isAuthenticated) {
             ContentView(isAuthenticated: $isAuthenticated)
@@ -98,8 +95,10 @@ struct AuthView: View {
     
     private func handleAuth() {
         if !isShowingLogin {
+            // Kayıt işlemi için basit kontrol
             guard password == confirmPassword else { return }
         }
-        showSplashScreen = true
+        // Başarılı giriş/kayıt sonrası
+        isAuthenticated = true
     }
 } 
