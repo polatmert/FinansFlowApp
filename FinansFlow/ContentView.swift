@@ -11,32 +11,44 @@ struct ContentView: View {
     @State private var transactions: [Transaction] = []
     @State private var showingAddTransaction = false
     @State private var selectedTab = 0
-    @State private var selectedTransactionType: TransactionType = .income
-    @Environment(\.presentationMode) var presentationMode
+    @State private var selectedDate = Date()
     @Binding var isAuthenticated: Bool
+    
+    private var currentMonthTransactions: [Transaction] {
+        let calendar = Calendar.current
+        return transactions.filter { transaction in
+            calendar.isDate(transaction.date, equalTo: selectedDate, toGranularity: .month)
+        }
+    }
     
     var body: some View {
         TabView(selection: $selectedTab) {
-            // Ana Sayfa
             NavigationView {
                 ScrollView {
                     VStack(spacing: 24) {
-                        // Üst Kart - Toplam Varlık
-                        TotalAssetsCard(transactions: transactions)
+                        // Ay Seçici
+                        MonthPickerView(selectedDate: $selectedDate)
+                            .padding(.horizontal)
+                        
+                        // Toplam Varlık
+                        TotalAssetsCard(transactions: currentMonthTransactions)
                         
                         // Varlık Dağılımı
-                        AssetDistributionCard(transactions: transactions)
+                        AssetDistributionCard(transactions: currentMonthTransactions)
                         
                         // Hızlı İşlemler
-                        QuickActionsCard(showingAddTransaction: $showingAddTransaction, transactions: $transactions)
+                        QuickActionsCard(
+                            showingAddTransaction: $showingAddTransaction,
+                            transactions: $transactions
+                        )
                         
-                        // Son Hareketler
+                        // Son İşlemler
                         if transactions.isEmpty {
                             Text("Henüz işlem bulunmuyor")
                                 .foregroundColor(ThemeColors.lightText)
                                 .padding()
                         } else {
-                            RecentTransactionsCard(transactions: transactions.sorted(by: { $0.date > $1.date }))
+                            RecentTransactionsCard(transactions: currentMonthTransactions)
                         }
                     }
                     .padding()
@@ -69,7 +81,11 @@ struct ContentView: View {
             .tag(0)
         }
         .sheet(isPresented: $showingAddTransaction) {
-            AddTransactionView(isPresented: $showingAddTransaction, transactions: $transactions)
+            AddTransactionView(
+                isPresented: $showingAddTransaction,
+                transactions: $transactions,
+                initialType: .income
+            )
         }
     }
     
