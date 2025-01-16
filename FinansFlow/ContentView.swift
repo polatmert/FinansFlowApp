@@ -6,19 +6,35 @@
 //
 
 import SwiftUI
+import UserNotifications
 
 struct ContentView: View {
     @State private var transactions: [Transaction] = []
     @State private var showingAddTransaction = false
     @State private var selectedTab = 0
     @State private var selectedDate = Date()
+    @State private var showLimitSettings = false
+    @State private var showLimitAlert = false
     @Binding var isAuthenticated: Bool
+    @StateObject private var userSettings = UserSettings.shared
     
     private var currentMonthTransactions: [Transaction] {
         let calendar = Calendar.current
         return transactions.filter { transaction in
             calendar.isDate(transaction.date, equalTo: selectedDate, toGranularity: .month)
         }
+    }
+    
+    private var currentBalance: Double {
+        let totalIncome = transactions
+            .filter { $0.type == .income }
+            .reduce(0) { $0 + $1.amount }
+        
+        let totalExpense = transactions
+            .filter { $0.type == .expense }
+            .reduce(0) { $0 + $1.amount }
+        
+        return totalIncome - totalExpense
     }
     
     var body: some View {
@@ -79,6 +95,15 @@ struct ContentView: View {
                 Text("Ana Sayfa")
             }
             .tag(0)
+            
+            NavigationView {
+                MonthlyLimitView()
+            }
+            .tabItem {
+                Image(systemName: "chart.line.downtrend.xyaxis")
+                Text("Limit Ayarları")
+            }
+            .tag(1)
         }
         .sheet(isPresented: $showingAddTransaction) {
             AddTransactionView(
@@ -87,10 +112,45 @@ struct ContentView: View {
                 initialType: .income
             )
         }
+        .sheet(isPresented: $showLimitSettings) {
+            MonthlyLimitSettingsView()
+        }
+        .onAppear {
+            // İlk kez giriş yapıldığında limit ayarları ekranını göster
+            if !UserDefaults.standard.bool(forKey: "hasShownInitialLimitSettings") {
+                showLimitSettings = true
+                UserDefaults.standard.set(true, forKey: "hasShownInitialLimitSettings")
+            }
+            _ = NotificationManager.shared // NotificationManager'ı başlat
+        }
+        .onChange(of: transactions) { newTransactions in
+            checkMonthlyLimit()
+        }
+        .alert("Finansal Uyarı! 🚨", isPresented: $showLimitAlert) {
+            Button("Tamam", role: .cancel) { }
+        } message: {
+            Text("""
+                Dikkat! Finansal sağlığınız risk altında!
+                Mevcut bakiyeniz: ₺\(String(format: "%.2f", currentBalance))
+                Belirlediğiniz limit: ₺\(String(format: "%.2f", userSettings.monthlyLimitAmount))
+                
+                Lütfen harcamalarınızı gözden geçirin.
+                """)
+        }
     }
     
     private func logout() {
         isAuthenticated = false
+    }
+    
+    private func checkMonthlyLimit() {
+        if currentBalance < userSettings.monthlyLimitAmount && userSettings.monthlyLimitEnabled {
+            showLimitAlert = true
+            NotificationManager.shared.sendLimitNotification(
+                currentBalance: currentBalance,
+                limitAmount: userSettings.monthlyLimitAmount
+            )
+        }
     }
 }
 

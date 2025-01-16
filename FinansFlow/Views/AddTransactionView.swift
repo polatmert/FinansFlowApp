@@ -3,15 +3,19 @@ import SwiftUI
 struct AddTransactionView: View {
     @Binding var isPresented: Bool
     @Binding var transactions: [Transaction]
-    @State private var amount: String = ""
-    @State private var selectedType: TransactionType
-    @State private var selectedCategory: Category = .cash
-    @State private var note: String = ""
     
-    init(isPresented: Binding<Bool>, transactions: Binding<[Transaction]>, initialType: TransactionType = .income) {
+    @State private var amount = ""
+    @State private var selectedType: TransactionType
+    @State private var selectedCategory: Category = .other
+    @State private var note = ""
+    
+    init(isPresented: Binding<Bool>, transactions: Binding<[Transaction]>, initialType: TransactionType) {
         self._isPresented = isPresented
         self._transactions = transactions
         self._selectedType = State(initialValue: initialType)
+        self.amount = ""
+        self.note = ""
+        self.selectedCategory = .other
     }
     
     var body: some View {
@@ -24,26 +28,34 @@ struct AddTransactionView: View {
                 isPresented: $isPresented,
                 saveAction: saveTransaction
             )
+            .navigationTitle("İşlem Ekle")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button("İptal") {
+                        isPresented = false
+                    }
+                }
+            }
         }
+        .interactiveDismissDisabled()
     }
     
     private func saveTransaction() {
-        guard let amountValue = Double(amount.replacingOccurrences(of: ",", with: ".")) else { return }
+        guard let amountDouble = Double(amount.replacingOccurrences(of: ",", with: ".")) else { return }
         
-        let newTransaction = Transaction(
-            amount: amountValue,
+        let transaction = Transaction(
+            amount: amountDouble,
             type: selectedType,
             category: selectedCategory,
-            date: Date(),
             note: note
         )
         
-        transactions.append(newTransaction)
+        transactions.append(transaction)
         isPresented = false
     }
 }
 
-// Ana form görünümü
 private struct TransactionFormView: View {
     @Binding var amount: String
     @Binding var selectedType: TransactionType
@@ -70,34 +82,21 @@ private struct TransactionFormView: View {
                 .background(Color.white)
                 .cornerRadius(20)
                 .shadow(color: Color.black.opacity(0.1), radius: 10, x: 0, y: 5)
-                .padding()
             }
         }
-        .gesture(
-            TapGesture()
-                .onEnded { _ in
-                    UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder),
-                                                 to: nil, from: nil, for: nil)
-                }
-        )
-        .navigationTitle(selectedType == .income ? "Gelir Ekle" : "Gider Ekle")
-        .navigationBarTitleDisplayMode(.large)
-        .toolbarColorScheme(.dark, for: .navigationBar)
-        .toolbarBackground(selectedType == .income ? ThemeColors.income : ThemeColors.expense, for: .navigationBar)
-        .toolbarBackground(.visible, for: .navigationBar)
-        .navigationBarTitleTextColor(.white)
-        .toolbar {
-            ToolbarItem(placement: .navigationBarLeading) {
-                Button("İptal") {
-                    isPresented = false
-                }
-                .foregroundColor(.white)
-            }
+        .onTapGesture {
+            hideKeyboard()
         }
     }
     
     private var backgroundColor: Color {
-        selectedType == .income ? Color(hex: "#E8F5E9") : Color(hex: "#FFEBEE")
+        selectedType == .income ? ThemeColors.income.opacity(0.1) : ThemeColors.expense.opacity(0.1)
+    }
+}
+
+extension View {
+    func hideKeyboard() {
+        UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
     }
 }
 
@@ -323,3 +322,4 @@ extension View {
         return self
     }
 } 
+

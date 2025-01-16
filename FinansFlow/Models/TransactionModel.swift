@@ -1,11 +1,11 @@
 import Foundation
 
-enum TransactionType: String, Codable {
+enum TransactionType: String, Codable, Equatable {
     case income = "Gelir"
     case expense = "Gider"
 }
 
-enum Category: String, Codable, CaseIterable {
+enum Category: String, Codable, CaseIterable, Equatable {
     case cash = "Nakit"
     case foreignCurrency = "Döviz"
     case gold = "Altın"
@@ -17,7 +17,7 @@ enum Category: String, Codable, CaseIterable {
     case other = "Diğer"
 }
 
-struct Transaction: Identifiable, Codable {
+struct Transaction: Identifiable, Codable, Equatable {
     let id: UUID
     var amount: Double
     var type: TransactionType
@@ -25,7 +25,7 @@ struct Transaction: Identifiable, Codable {
     var date: Date
     var note: String
     
-    init(id: UUID = UUID(), amount: Double, type: TransactionType, category: Category, date: Date = Date(), note: String) {
+    init(id: UUID = UUID(), amount: Double, type: TransactionType, category: Category, date: Date = Date(), note: String = "") {
         self.id = id
         self.amount = amount
         self.type = type
