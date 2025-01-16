@@ -5,52 +5,59 @@ struct RecentTransactionsCard: View {
     
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
-            Text("Son Hareketler")
+            Text("Son İşlemler")
                 .font(.headline)
                 .foregroundColor(ThemeColors.text)
             
-            ForEach(transactions.prefix(5)) { transaction in
-                TransactionRow(transaction: transaction)
-                if transaction.id != transactions.last?.id {
-                    Divider()
+            VStack(spacing: 12) {
+                ForEach(transactions.prefix(5)) { transaction in
+                    VStack(alignment: .leading, spacing: 8) {
+                        HStack {
+                            // Kategori ve Tutar
+                            VStack(alignment: .leading) {
+                                Text(transaction.category.rawValue)
+                                    .font(.headline)
+                                    .foregroundColor(ThemeColors.text)
+                                
+                                Text("₺\(transaction.amount, specifier: "%.2f")")
+                                    .font(.subheadline)
+                                    .foregroundColor(transaction.type == .income ? ThemeColors.income : ThemeColors.expense)
+                            }
+                            
+                            Spacer()
+                            
+                            // Tarih
+                            Text(formatDate(transaction.date))
+                                .font(.caption)
+                                .foregroundColor(ThemeColors.lightText)
+                        }
+                        
+                        // Not alanı (eğer varsa)
+                        if !transaction.note.isEmpty {
+                            Text(transaction.note)
+                                .font(.subheadline)
+                                .foregroundColor(ThemeColors.lightText)
+                                .lineLimit(2)
+                        }
+                    }
+                    .padding()
+                    .background(ThemeColors.cardBackground)
+                    .cornerRadius(12)
+                    
+                    if transaction.id != transactions.prefix(5).last?.id {
+                        Divider()
+                    }
                 }
             }
         }
-        .padding(20)
+        .padding()
         .background(ThemeColors.cardBackground)
         .cornerRadius(16)
-        .shadow(color: Color.black.opacity(0.05), radius: 10, x: 0, y: 4)
     }
-}
-
-struct TransactionRow: View {
-    let transaction: Transaction
     
-    var body: some View {
-        HStack {
-            // İkon
-            Image(systemName: transaction.type == .income ? "arrow.down.circle.fill" : "arrow.up.circle.fill")
-                .foregroundColor(transaction.type == .income ? ThemeColors.income : ThemeColors.expense)
-                .font(.title2)
-            
-            // İşlem detayları
-            VStack(alignment: .leading, spacing: 4) {
-                Text(transaction.category.rawValue)
-                    .foregroundColor(ThemeColors.text)
-                if !transaction.note.isEmpty {
-                    Text(transaction.note)
-                        .font(.subheadline)
-                        .foregroundColor(ThemeColors.lightText)
-                }
-            }
-            
-            Spacer()
-            
-            // Tutar
-            Text(transaction.type == .income ? 
-                 String(format: "+₺%.2f", transaction.amount) :
-                 String(format: "-₺%.2f", transaction.amount))
-                .foregroundColor(transaction.type == .income ? ThemeColors.income : ThemeColors.expense)
-        }
+    private func formatDate(_ date: Date) -> String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "dd.MM.yyyy"
+        return formatter.string(from: date)
     }
 } 
