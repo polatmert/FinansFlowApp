@@ -15,16 +15,14 @@ struct BinanceWebView: UIViewControllerRepresentable {
 struct QuickActionsCard: View {
     @Binding var showingAddTransaction: Bool
     @Binding var transactions: [Transaction]
-    @State private var selectedTransactionType: TransactionType = .income
+    @Binding var selectedTransactionType: TransactionType
     @State private var showingBinanceWebView = false
     
     var actions: [QuickAction] {
         [
             QuickAction(title: "Gelir Ekle", icon: "plus.circle.fill", color: ThemeColors.income, type: .income),
             QuickAction(title: "Gider Ekle", icon: "minus.circle.fill", color: ThemeColors.expense, type: .expense),
-            QuickAction(title: "Binance", icon: "bitcoinsign.circle.fill", color: Color(hex: "#F3BA2F"), type: .income) {
-                showingBinanceWebView = true
-            },
+            QuickAction(title: "Binance", icon: "bitcoinsign.circle.fill", color: Color(hex: "#F3BA2F"), type: .income),
             QuickAction(title: "Döviz", icon: "dollarsign.circle.fill", color: Color(hex: "#3498DB"), type: .income)
         ]
     }

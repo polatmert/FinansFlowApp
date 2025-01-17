@@ -15,6 +15,7 @@ struct ContentView: View {
     @State private var selectedDate = Date()
     @State private var showLimitSettings = false
     @State private var showLimitAlert = false
+    @State private var selectedTransactionType: TransactionType = .income
     @Binding var isAuthenticated: Bool
     @StateObject private var userSettings = UserSettings.shared
     
@@ -25,80 +26,87 @@ struct ContentView: View {
         }
     }
     
-    private var currentBalance: Double {
-        let totalIncome = transactions
+    private var totalIncome: Double {
+        transactions
             .filter { $0.type == .income }
             .reduce(0) { $0 + $1.amount }
-        
-        let totalExpense = transactions
+    }
+    
+    private var totalExpense: Double {
+        transactions
             .filter { $0.type == .expense }
             .reduce(0) { $0 + $1.amount }
-        
-        return totalIncome - totalExpense
+    }
+    
+    private var currentBalance: Double {
+        totalIncome - totalExpense
+    }
+    
+    // Ana sayfa view'ı
+    private var homeView: some View {
+        NavigationView {
+            ScrollView {
+                VStack(spacing: 24) {
+                    MonthPickerView(selectedDate: $selectedDate)
+                        .padding(.horizontal)
+                    
+                    TotalAssetsCard(transactions: currentMonthTransactions)
+                    AssetDistributionCard(transactions: currentMonthTransactions)
+                    QuickActionsCard(
+                        showingAddTransaction: $showingAddTransaction,
+                        transactions: $transactions,
+                        selectedTransactionType: $selectedTransactionType
+                    )
+                    
+                    if transactions.isEmpty {
+                        Text("Henüz işlem bulunmuyor")
+                            .foregroundColor(ThemeColors.lightText)
+                            .padding()
+                    } else {
+                        RecentTransactionsCard(transactions: currentMonthTransactions)
+                    }
+                }
+                .padding()
+            }
+            .background(ThemeColors.background.ignoresSafeArea())
+            .navigationTitle("Varlıklarım")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                toolbarContent
+            }
+        }
+    }
+    
+    // Toolbar içeriği
+    private var toolbarContent: some ToolbarContent {
+        ToolbarItem(placement: .navigationBarTrailing) {
+            HStack {
+                Button(action: {
+                    selectedTransactionType = .income
+                    showingAddTransaction = true
+                }) {
+                    Image(systemName: "plus.circle.fill")
+                        .font(.title2)
+                        .foregroundColor(ThemeColors.primary)
+                }
+                
+                Button(action: logout) {
+                    Image(systemName: "rectangle.portrait.and.arrow.right")
+                        .font(.title2)
+                        .foregroundColor(ThemeColors.expense)
+                }
+            }
+        }
     }
     
     var body: some View {
         TabView(selection: $selectedTab) {
-            NavigationView {
-                ScrollView {
-                    VStack(spacing: 24) {
-                        // Ay Seçici
-                        MonthPickerView(selectedDate: $selectedDate)
-                            .padding(.horizontal)
-                        
-                        // Toplam Varlık
-                        TotalAssetsCard(transactions: currentMonthTransactions)
-                        
-                        // Varlık Dağılımı
-                        AssetDistributionCard(transactions: currentMonthTransactions)
-                        
-                        // Hızlı İşlemler
-                        QuickActionsCard(
-                            showingAddTransaction: $showingAddTransaction,
-                            transactions: $transactions
-                        )
-                        
-                        // Son İşlemler
-                        if transactions.isEmpty {
-                            Text("Henüz işlem bulunmuyor")
-                                .foregroundColor(ThemeColors.lightText)
-                                .padding()
-                        } else {
-                            RecentTransactionsCard(transactions: currentMonthTransactions)
-                        }
-                    }
-                    .padding()
+            homeView
+                .tabItem {
+                    Image(systemName: "house.fill")
+                    Text("Ana Sayfa")
                 }
-                .background(ThemeColors.background.ignoresSafeArea())
-                .navigationTitle("Varlıklarım")
-                .navigationBarTitleDisplayMode(.inline)
-                .toolbar {
-                    ToolbarItem(placement: .navigationBarTrailing) {
-                        HStack {
-                            Button(action: {
-                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                                    showingAddTransaction = true
-                                }
-                            }) {
-                                Image(systemName: "plus.circle.fill")
-                                    .font(.title2)
-                                    .foregroundColor(ThemeColors.primary)
-                            }
-                            
-                            Button(action: logout) {
-                                Image(systemName: "rectangle.portrait.and.arrow.right")
-                                    .font(.title2)
-                                    .foregroundColor(ThemeColors.expense)
-                            }
-                        }
-                    }
-                }
-            }
-            .tabItem {
-                Image(systemName: "house.fill")
-                Text("Ana Sayfa")
-            }
-            .tag(0)
+                .tag(0)
             
             NavigationView {
                 MonthlyLimitView()
@@ -113,7 +121,7 @@ struct ContentView: View {
             AddTransactionView(
                 isPresented: $showingAddTransaction,
                 transactions: $transactions,
-                initialType: .income
+                initialType: selectedTransactionType
             )
         }
         .sheet(isPresented: $showLimitSettings) {
