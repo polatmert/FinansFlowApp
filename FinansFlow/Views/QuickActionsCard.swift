@@ -17,6 +17,7 @@ struct QuickActionsCard: View {
     @Binding var transactions: [Transaction]
     @Binding var selectedTransactionType: TransactionType
     @State private var showingBinanceWebView = false
+    @State private var binanceURL = URL(string: "https://www.binance.com/tr")!
     
     var actions: [QuickAction] {
         [
@@ -36,12 +37,7 @@ struct QuickActionsCard: View {
             HStack(spacing: 20) {
                 ForEach(actions) { action in
                     Button(action: {
-                        if action.title == "Binance" {
-                            showingBinanceWebView = true
-                        } else {
-                            selectedTransactionType = action.type
-                            showingAddTransaction = true
-                        }
+                        handleActionTap(action)
                     }) {
                         QuickActionView(action: action)
                     }
@@ -52,17 +48,37 @@ struct QuickActionsCard: View {
         .background(ThemeColors.cardBackground)
         .cornerRadius(16)
         .shadow(color: Color.black.opacity(0.05), radius: 10, x: 0, y: 4)
-        .sheet(isPresented: $showingAddTransaction) {
-            AddTransactionView(
-                isPresented: $showingAddTransaction,
-                transactions: $transactions,
-                initialType: selectedTransactionType
-            )
-        }
         .sheet(isPresented: $showingBinanceWebView) {
-            BinanceWebView(url: URL(string: "https://www.binance.com/tr")!)
+            SafariView(url: binanceURL)
+                .edgesIgnoringSafeArea(.all)
         }
     }
+    
+    private func handleActionTap(_ action: QuickAction) {
+        switch action.title {
+        case "Binance":
+            showingBinanceWebView = true
+        default:
+            selectedTransactionType = action.type
+            showingAddTransaction = true
+        }
+    }
+}
+
+struct SafariView: UIViewControllerRepresentable {
+    let url: URL
+    
+    func makeUIViewController(context: Context) -> SFSafariViewController {
+        let config = SFSafariViewController.Configuration()
+        config.entersReaderIfAvailable = false
+        config.barCollapsingEnabled = true
+        
+        let safariViewController = SFSafariViewController(url: url, configuration: config)
+        safariViewController.preferredControlTintColor = UIColor(ThemeColors.primary)
+        return safariViewController
+    }
+    
+    func updateUIViewController(_ uiViewController: SFSafariViewController, context: Context) {}
 }
 
 struct QuickActionView: View {
