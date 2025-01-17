@@ -99,6 +99,66 @@ struct ContentView: View {
         }
     }
     
+    private var alertView: some View {
+        VStack(spacing: 16) {
+            Image(systemName: "exclamationmark.triangle.fill")
+                .font(.system(size: 40))
+                .foregroundColor(ThemeColors.expense)
+            
+            Text("Finansal Uyarı! 🚨")
+                .font(.title2.bold())
+                .foregroundColor(ThemeColors.text)
+            
+            VStack(spacing: 8) {
+                Text("Dikkat! Finansal sağlığınız risk altında!")
+                    .font(.headline)
+                    .foregroundColor(ThemeColors.text)
+                    .multilineTextAlignment(.center)
+                
+                VStack(spacing: 4) {
+                    HStack {
+                        Text("Mevcut bakiye:")
+                            .foregroundColor(ThemeColors.text)
+                        Text("₺\(String(format: "%.2f", currentBalance))")
+                            .foregroundColor(ThemeColors.expense)
+                            .bold()
+                    }
+                    
+                    HStack {
+                        Text("Belirlenen limit:")
+                            .foregroundColor(ThemeColors.text)
+                        Text("₺\(String(format: "%.2f", userSettings.monthlyLimitAmount))")
+                            .foregroundColor(ThemeColors.primary)
+                            .bold()
+                    }
+                }
+                .font(.subheadline)
+                
+                Text("Lütfen harcamalarınızı gözden geçirin.")
+                    .font(.subheadline)
+                    .foregroundColor(ThemeColors.lightText)
+                    .padding(.top, 8)
+            }
+            
+            Button(action: {
+                showLimitAlert = false
+            }) {
+                Text("Anladım")
+                    .font(.headline)
+                    .foregroundColor(ThemeColors.cardBackground)
+                    .frame(maxWidth: .infinity)
+                    .padding()
+                    .background(ThemeColors.primary)
+                    .cornerRadius(12)
+            }
+            .padding(.top, 8)
+        }
+        .padding(24)
+        .background(ThemeColors.cardBackground)
+        .cornerRadius(16)
+        .shadow(color: Color.black.opacity(0.1), radius: 10)
+    }
+    
     var body: some View {
         TabView(selection: $selectedTab) {
             homeView
@@ -139,16 +199,24 @@ struct ContentView: View {
         .onChange(of: transactions) { newTransactions in
             checkMonthlyLimit()
         }
-        .alert("Finansal Uyarı! 🚨", isPresented: $showLimitAlert) {
-            Button("Tamam", role: .cancel) { }
-        } message: {
-            Text("""
-                Dikkat! Finansal sağlığınız risk altında!
-                Mevcut bakiyeniz: ₺\(String(format: "%.2f", currentBalance))
-                Belirlediğiniz limit: ₺\(String(format: "%.2f", userSettings.monthlyLimitAmount))
-                
-                Lütfen harcamalarınızı gözden geçirin.
-                """)
+        .alert(isPresented: $showLimitAlert) {
+            Alert(
+                title: Text(""),
+                message: Text(""),
+                dismissButton: .default(Text("")) {
+                    // Boş alert, custom view kullanacağız
+                }
+            )
+        }
+        .overlay {
+            if showLimitAlert {
+                Color.black.opacity(0.3)
+                    .ignoresSafeArea()
+                    .overlay {
+                        alertView
+                            .padding()
+                    }
+            }
         }
     }
     
