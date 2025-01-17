@@ -31,11 +31,54 @@ struct PieChartView: View {
     
     private func colorForCategory(_ category: Category) -> Color {
         switch category {
-        case .cash: return ThemeColors.primary
-        case .foreignCurrency: return Color(hex: "#3498DB")
-        case .gold: return Color(hex: "#F1C40F")
-        case .crypto: return Color(hex: "#E67E22")
-        default: return ThemeColors.secondary
+        case .salary:
+            return Color(hex: "#2ECC71")
+        case .investment:
+            return Color(hex: "#3498DB")
+        case .rental:
+            return Color(hex: "#F1C40F")
+        case .bonus:
+            return Color(hex: "#9B59B6")
+        case .freelance:
+            return Color(hex: "#1ABC9C")
+        case .interest:
+            return Color(hex: "#E67E22")
+        case .gift:
+            return Color(hex: "#27AE60")
+        case .refund:
+            return Color(hex: "#16A085")
+        case .otherIncome:
+            return Color(hex: "#2980B9")
+        case .rent:
+            return Color(hex: "#C0392B")
+        case .bills:
+            return Color(hex: "#E74C3C")
+        case .groceries:
+            return Color(hex: "#D35400")
+        case .dining:
+            return Color(hex: "#922B21")
+        case .transportation:
+            return Color(hex: "#CB4335")
+        case .shopping:
+            return Color(hex: "#A93226")
+        case .health:
+            return Color(hex: "#B03A2E")
+        case .education:
+            return Color(hex: "#943126")
+        case .entertainment:
+            return Color(hex: "#8B2C1C")
+        case .travel:
+            return Color(hex: "#922B21")
+        case .insurance:
+            return Color(hex: "#C0392B")
+        case .creditCard:
+            return Color(hex: "#E74C3C")
+        case .loan:
+            return Color(hex: "#D35400")
+        case .maintenance:
+            return Color(hex: "#CB4335")
+        case .otherExpense:
+            return Color(hex: "#95A5A6")
         }
     }
 }

@@ -75,7 +75,11 @@ struct ContentView: View {
                 .toolbar {
                     ToolbarItem(placement: .navigationBarTrailing) {
                         HStack {
-                            Button(action: { showingAddTransaction = true }) {
+                            Button(action: {
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                                    showingAddTransaction = true
+                                }
+                            }) {
                                 Image(systemName: "plus.circle.fill")
                                     .font(.title2)
                                     .foregroundColor(ThemeColors.primary)
@@ -116,12 +120,13 @@ struct ContentView: View {
             MonthlyLimitSettingsView()
         }
         .onAppear {
-            // İlk kez giriş yapıldığında limit ayarları ekranını göster
             if !UserDefaults.standard.bool(forKey: "hasShownInitialLimitSettings") {
-                showLimitSettings = true
-                UserDefaults.standard.set(true, forKey: "hasShownInitialLimitSettings")
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                    showLimitSettings = true
+                    UserDefaults.standard.set(true, forKey: "hasShownInitialLimitSettings")
+                }
             }
-            _ = NotificationManager.shared // NotificationManager'ı başlat
+            _ = NotificationManager.shared
         }
         .onChange(of: transactions) { newTransactions in
             checkMonthlyLimit()

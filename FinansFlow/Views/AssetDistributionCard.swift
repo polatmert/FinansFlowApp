@@ -202,46 +202,65 @@ struct ChartView: View {
         switch type {
         case .income:
             switch category {
-            case .cash:
-                return Color(hex: "#2ECC71") // Canlı yeşil
-            case .foreignCurrency:
-                return Color(hex: "#3498DB") // Parlak mavi
-            case .gold:
-                return Color(hex: "#F1C40F") // Canlı sarı
-            case .crypto:
-                return Color(hex: "#9B59B6") // Parlak mor
             case .salary:
+                return Color(hex: "#2ECC71") // Canlı yeşil
+            case .investment:
+                return Color(hex: "#3498DB") // Parlak mavi
+            case .rental:
+                return Color(hex: "#F1C40F") // Canlı sarı
+            case .bonus:
+                return Color(hex: "#9B59B6") // Parlak mor
+            case .freelance:
                 return Color(hex: "#1ABC9C") // Turkuaz
-            case .food:
+            case .interest:
                 return Color(hex: "#E67E22") // Turuncu
-            case .transport:
+            case .gift:
                 return Color(hex: "#27AE60") // Koyu yeşil
-            case .rent:
+            case .refund:
                 return Color(hex: "#16A085") // Deniz yeşili
-            case .other:
+            case .otherIncome:
                 return Color(hex: "#2980B9") // Koyu mavi
+            case .rent, .bills, .groceries, .dining, .transportation, 
+                 .shopping, .health, .education, .entertainment, .travel, 
+                 .insurance, .creditCard, .loan, .maintenance, .otherExpense:
+                return Color(hex: "#95A5A6") // Gri (varsayılan)
             }
             
         case .expense:
             switch category {
-            case .cash:
-                return Color(hex: "#C0392B") // Koyu kırmızı
-            case .foreignCurrency:
-                return Color(hex: "#E74C3C") // Parlak kırmızı
-            case .gold:
-                return Color(hex: "#D35400") // Koyu turuncu
-            case .crypto:
-                return Color(hex: "#922B21") // Bordo
-            case .salary:
-                return Color(hex: "#CB4335") // Kiremit kırmızısı
-            case .food:
-                return Color(hex: "#A93226") // Kan kırmızısı
-            case .transport:
-                return Color(hex: "#B03A2E") // Koyu bordo
             case .rent:
+                return Color(hex: "#C0392B") // Koyu kırmızı
+            case .bills:
+                return Color(hex: "#E74C3C") // Parlak kırmızı
+            case .groceries:
+                return Color(hex: "#D35400") // Koyu turuncu
+            case .dining:
+                return Color(hex: "#922B21") // Bordo
+            case .transportation:
+                return Color(hex: "#CB4335") // Kiremit kırmızısı
+            case .shopping:
+                return Color(hex: "#A93226") // Kan kırmızısı
+            case .health:
+                return Color(hex: "#B03A2E") // Koyu bordo
+            case .education:
                 return Color(hex: "#943126") // Kahverengi kırmızı
-            case .other:
+            case .entertainment:
                 return Color(hex: "#8B2C1C") // En koyu kırmızı
+            case .travel:
+                return Color(hex: "#922B21") // Bordo
+            case .insurance:
+                return Color(hex: "#C0392B") // Koyu kırmızı
+            case .creditCard:
+                return Color(hex: "#E74C3C") // Parlak kırmızı
+            case .loan:
+                return Color(hex: "#D35400") // Koyu turuncu
+            case .maintenance:
+                return Color(hex: "#CB4335") // Kiremit kırmızısı
+            case .otherExpense:
+                return Color(hex: "#95A5A6") // Gri
+            case .salary, .investment, .rental, .bonus, .freelance,
+                 .interest, .gift, .refund, .otherIncome:
+                return Color(hex: "#95A5A6") // Gri (varsayılan)
             }
         }
     }

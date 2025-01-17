@@ -6,16 +6,16 @@ struct AddTransactionView: View {
     
     @State private var amount = ""
     @State private var selectedType: TransactionType
-    @State private var selectedCategory: Category = .other
+    @State private var selectedCategory: Category
     @State private var note = ""
     
     init(isPresented: Binding<Bool>, transactions: Binding<[Transaction]>, initialType: TransactionType) {
         self._isPresented = isPresented
         self._transactions = transactions
         self._selectedType = State(initialValue: initialType)
+        self._selectedCategory = State(initialValue: initialType == .income ? .otherIncome : .otherExpense)
         self.amount = ""
         self.note = ""
-        self.selectedCategory = .other
     }
     
     var body: some View {
@@ -184,7 +184,8 @@ private struct TransactionDetailsView: View {
                 
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(spacing: 12) {
-                        ForEach(Category.allCases, id: \.self) { category in
+                        let categories = selectedType == .income ? Category.incomeCategories : Category.expenseCategories
+                        ForEach(categories, id: \.self) { category in
                             CategoryButton(
                                 category: category,
                                 isSelected: selectedCategory == category,
@@ -274,17 +275,7 @@ struct CategoryButton: View {
     }
     
     private func iconName(for category: Category) -> String {
-        switch category {
-        case .cash: return "banknote"
-        case .foreignCurrency: return "dollarsign.circle"
-        case .gold: return "circle.circle"
-        case .crypto: return "bitcoinsign.circle"
-        case .salary: return "wallet.pass"
-        case .food: return "fork.knife"
-        case .transport: return "car"
-        case .rent: return "house"
-        case .other: return "ellipsis.circle"
-        }
+        category.icon
     }
 }
 

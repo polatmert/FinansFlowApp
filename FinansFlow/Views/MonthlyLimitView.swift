@@ -10,7 +10,7 @@ struct MonthlyLimitView: View {
     var body: some View {
         NavigationView {
             ScrollView {
-                VStack(spacing: 24) {
+                VStack(spacing: 16) {
                     // Üst Kart
                     VStack(spacing: 16) {
                         Image(systemName: "bell.badge.fill")
@@ -109,6 +109,7 @@ struct MonthlyLimitView: View {
             .background(ThemeColors.background.ignoresSafeArea())
             .navigationTitle("Limit Ayarları")
             .navigationBarTitleDisplayMode(.large)
+            .navigationBarTitleTextColor(ThemeColors.text)
             .alert("Limit Güncellendi", isPresented: $showingSaveAlert) {
                 Button("Tamam", role: .cancel) { 
                     isTextFieldFocused = false
