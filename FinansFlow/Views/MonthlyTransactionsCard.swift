@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct MonthlyTransactionsCard: View {
-    let transactions: [Transaction]
+    @Binding var transactions: [Transaction]
     
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
@@ -16,7 +16,10 @@ struct MonthlyTransactionsCard: View {
                     .padding(.vertical)
             } else {
                 ForEach(transactions.sorted(by: { $0.date > $1.date })) { transaction in
-                    TransactionRow(transaction: transaction)
+                    TransactionRow(
+                        transaction: transaction,
+                        onDelete: { deleteTransaction(transaction) }
+                    )
                     if transaction.id != transactions.last?.id {
                         Divider()
                     }
@@ -26,6 +29,13 @@ struct MonthlyTransactionsCard: View {
         .padding(20)
         .background(ThemeColors.cardBackground)
         .cornerRadius(16)
-        .shadow(color: Color.black.opacity(0.05), radius: 10, x: 0, y: 4)
+    }
+    
+    private func deleteTransaction(_ transaction: Transaction) {
+        withAnimation {
+            if let index = transactions.firstIndex(where: { $0.id == transaction.id }) {
+                transactions.remove(at: index)
+            }
+        }
     }
 } 

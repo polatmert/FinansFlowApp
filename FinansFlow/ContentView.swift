@@ -63,7 +63,7 @@ struct ContentView: View {
                             .foregroundColor(ThemeColors.lightText)
                             .padding()
                     } else {
-                        RecentTransactionsCard(transactions: currentMonthTransactions)
+                        RecentTransactionsCard(transactions: $transactions)
                     }
                 }
                 .padding()

@@ -2,6 +2,7 @@ import SwiftUI
 
 struct TransactionRow: View {
     let transaction: Transaction
+    var onDelete: () -> Void
     
     private let dateFormatter: DateFormatter = {
         let formatter = DateFormatter()
@@ -35,6 +36,12 @@ struct TransactionRow: View {
             Text("₺\(transaction.amount, specifier: "%.2f")")
                 .font(.headline)
                 .foregroundColor(transaction.type == .income ? ThemeColors.income : ThemeColors.expense)
+            
+            Button(action: onDelete) {
+                Image(systemName: "trash")
+                    .foregroundColor(ThemeColors.expense)
+            }
+            .padding(.leading, 8)
         }
         .padding(.vertical, 8)
     }
