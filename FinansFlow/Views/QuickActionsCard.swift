@@ -1,16 +1,33 @@
 import SwiftUI
+import SafariServices
+
+// BinanceWebView yapısı
+struct BinanceWebView: UIViewControllerRepresentable {
+    let url: URL
+    
+    func makeUIViewController(context: Context) -> SFSafariViewController {
+        return SFSafariViewController(url: url)
+    }
+    
+    func updateUIViewController(_ uiViewController: SFSafariViewController, context: Context) {}
+}
 
 struct QuickActionsCard: View {
     @Binding var showingAddTransaction: Bool
     @Binding var transactions: [Transaction]
     @State private var selectedTransactionType: TransactionType = .income
+    @State private var showingBinanceWebView = false
     
-    let actions = [
-        QuickAction(title: "Gelir Ekle", icon: "plus.circle.fill", color: ThemeColors.income, type: .income),
-        QuickAction(title: "Gider Ekle", icon: "minus.circle.fill", color: ThemeColors.expense, type: .expense),
-        QuickAction(title: "Transfer", icon: "arrow.left.arrow.right.circle.fill", color: ThemeColors.primary, type: .income),
-        QuickAction(title: "Döviz", icon: "dollarsign.circle.fill", color: Color(hex: "#3498DB"), type: .income)
-    ]
+    var actions: [QuickAction] {
+        [
+            QuickAction(title: "Gelir Ekle", icon: "plus.circle.fill", color: ThemeColors.income, type: .income),
+            QuickAction(title: "Gider Ekle", icon: "minus.circle.fill", color: ThemeColors.expense, type: .expense),
+            QuickAction(title: "Binance", icon: "bitcoinsign.circle.fill", color: Color(hex: "#F3BA2F"), type: .income) {
+                showingBinanceWebView = true
+            },
+            QuickAction(title: "Döviz", icon: "dollarsign.circle.fill", color: Color(hex: "#3498DB"), type: .income)
+        ]
+    }
     
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
@@ -21,8 +38,12 @@ struct QuickActionsCard: View {
             HStack(spacing: 20) {
                 ForEach(actions) { action in
                     Button(action: {
-                        selectedTransactionType = action.type
-                        showingAddTransaction = true
+                        if action.title == "Binance" {
+                            showingBinanceWebView = true
+                        } else {
+                            selectedTransactionType = action.type
+                            showingAddTransaction = true
+                        }
                     }) {
                         QuickActionView(action: action)
                     }
@@ -40,15 +61,10 @@ struct QuickActionsCard: View {
                 initialType: selectedTransactionType
             )
         }
+        .sheet(isPresented: $showingBinanceWebView) {
+            BinanceWebView(url: URL(string: "https://www.binance.com/tr")!)
+        }
     }
-}
-
-struct QuickAction: Identifiable {
-    let id = UUID()
-    let title: String
-    let icon: String
-    let color: Color
-    let type: TransactionType
 }
 
 struct QuickActionView: View {
